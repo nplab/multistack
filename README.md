@@ -50,16 +50,13 @@ For more details, see multistack/examples/pkt-gen.c (a modified version of netma
 	
 ## How to Build the Code (FreeBSD)
 
-Assuming that the kernel source code directory is `~/head/` use
+Assuming that the kernel source code directory is `/home/tuexen/head/` use
 ````
 cd multistack/sys/contrib/multistack
-env SYSDIR=~/head/sys make
+env SYSDIR=/home/tuexen/head/sys make
 ````
-If you also want SCTP support, you need to do
-````
-echo "#define SCTP 1" > opt_sctp.h
-env SYSDIR=~/head/sys make
-````
+
+Please note that you need r285877 or higher of the FreeBSD HEAD sources [(see patch)](https://svnweb.freebsd.org/changeset/base/285877) to get multistack compiling with SCTP support.
 
 ## Author
 
