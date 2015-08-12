@@ -480,7 +480,8 @@ ms_route_pkt2(uint8_t *buf, uint8_t **hint)
 static inline int
 ms_host_na(const struct netmap_vp_adapter *na)
 {
-	return NA(na->up.ifp)->na_vp != na;
+	printf("na: %p - na->up.ifp: %p\n",na,na->up.ifp);
+	return na && na->up.ifp && NA(na->up.ifp)->na_vp != na;
 //	return na->up.pdev ? 0 : 1;
 }
 
