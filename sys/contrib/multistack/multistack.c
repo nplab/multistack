@@ -480,8 +480,11 @@ ms_route_pkt2(uint8_t *buf, uint8_t **hint)
 static inline int
 ms_host_na(const struct netmap_vp_adapter *na)
 {
-	printf("na: %p - na->up.ifp: %p\n",na,na->up.ifp);
-	return na && na->up.ifp && NA(na->up.ifp)->na_vp != na;
+	printf("geht noch\n");
+	printf("%p\n",na);
+	printf("%p\n",na->up.ifp);
+	printf("geht immer noch\n");
+	return na->up.ifp && NA(na->up.ifp)->na_vp != na;
 //	return na->up.pdev ? 0 : 1;
 }
 
@@ -490,14 +493,15 @@ static u_int
 #ifdef NETMAP_API_4
 ms_lookup(struct nm_bdg_fwd *ft, uint8_t *ring_nr, const struct netmap_adapter *na)
 #else
-ms_lookup(struct nm_bdg_fwd *ft, uint8_t *ring_nr,
-	struct netmap_vp_adapter *na)
+ms_lookup(struct nm_bdg_fwd *ft, uint8_t *ring_nr,  struct netmap_vp_adapter *na)
 #endif
 {
 	struct ms_route *mrt;
 	uint8_t *hint;
 	int input;
 	char tmp[256];
+
+	printf("ms_lookup - 1 : %p\n",na);
 
 #ifdef MULTITACK_MBOXFILTER
 	if (ms_global.portinfo[na->bdg_port].flags & MS_F_STACK) {
@@ -510,20 +514,28 @@ ms_lookup(struct nm_bdg_fwd *ft, uint8_t *ring_nr,
 
 	/* XXX treat packets from an unrecognized port as input */
 	ms_pkt2str(ft->ft_buf, tmp);
+	printf("ms_lookup - 2 : %p\n",na);
 
 	/* we don't validate packets from host stack */
 	if (ms_host_na(na)) {
 //		return na->up.na_vp->bdg_port;
+		printf("geht immer immer noch\n");
+		printf("gucken: %p - %p - %u\n",NA(na->up.ifp),NA(na->up.ifp)->na_vp,  NA(na->up.ifp)->na_vp->bdg_port);
+		printf("geht immer immer immer noch\n");
 		return NA(na->up.ifp)->na_vp->bdg_port;
 	}
-
+	printf("ms_lookup - 3 : %p\n",na);
 	input = ms_global.portinfo[na->bdg_port].flags & MS_F_STACK ? 0 : 1;
-
+	printf("ms_lookup - 4 : %p\n",na);
 	mrt = ms_route_pkt(ft->ft_buf, &hint, input);
-	if (mrt == NULL)
-		return na->up.na_hostvp->bdg_port; /* going to host stack */
+	printf("ms_lookup - 5 : %p\n",na);
+	if (mrt == NULL) {
+		printf("ms_lookup - 6 : %p - %p\n",na, na->up.na_hostvp);
+		return na->up.na_hostvp && na->up.na_hostvp->bdg_port; /* going to host stack */
+	}
 	/* The least significant byte of the opposite port */
 	*ring_nr = ntohs(*hint) & 0xF;
+	printf("ms_lookup - 7 : %p\n",na);
 	return input ? mrt->bdg_port : mrt->bdg_dstport;
 }
 
