@@ -480,7 +480,7 @@ ms_route_pkt2(uint8_t *buf, uint8_t **hint)
 static inline int
 ms_host_na(const struct netmap_vp_adapter *na)
 {
-	return NA(na->up.ifp)->na_vp != na;
+	return na->up.ifp && NA(na->up.ifp)->na_vp != na;
 //	return na->up.pdev ? 0 : 1;
 }
 
@@ -520,7 +520,7 @@ ms_lookup(struct nm_bdg_fwd *ft, uint8_t *ring_nr,
 
 	mrt = ms_route_pkt(ft->ft_buf, &hint, input);
 	if (mrt == NULL)
-		return na->up.na_hostvp->bdg_port; /* going to host stack */
+		return na->up.na_hostvp && na->up.na_hostvp->bdg_port; /* going to host stack */
 	/* The least significant byte of the opposite port */
 	*ring_nr = ntohs(*hint) & 0xF;
 	return input ? mrt->bdg_port : mrt->bdg_dstport;
